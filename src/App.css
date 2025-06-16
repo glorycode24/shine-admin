@@ -1,38 +1,130 @@
-.App {
+/* src/App.css - NEW THEMED VERSION */
+
+/* --- Base Styles & Variables --- */
+:root {
+  --bg-light-beige: #f5f5f0;
+  --bg-beige: #e8e0d5;
+  --border-beige: #d0c8b8;
+  --text-dark: #333;
+  --brand-brown: #8b7355;
+  --brand-brown-dark: #7a6345;
+  --accent-purple: #667eea;
+  --text-light: white;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-light-beige);
+  color: var(--text-dark);
+}
+
+/* --- Header --- */
+.app-header {
+  background-color: var(--bg-beige);
+  color: var(--brand-brown);
+  padding: 20px;
+  text-align: center;
+  border-bottom: 2px solid var(--border-beige);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-weight: bold;
+}
+
+/* --- Main Layout --- */
+.container {
+  display: flex;
+  flex-direction: column; /* Stack sections vertically */
+  gap: 30px;
+  padding: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* --- Manager Section Styling (for Product & Category cards) --- */
+.manager-section {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-beige);
+}
+
+.manager-section h2 {
+  text-align: center;
+  color: var(--brand-brown);
+  margin-top: 0;
+  margin-bottom: 30px;
+}
+
+/* --- Form Elements --- */
+input, select, textarea {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--brand-brown);
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Buttons --- */
+button {
+  background: var(--brand-brown);
+  color: var(--text-light);
+  padding: 15px 20px;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background: var(--brand-brown-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(139, 115, 85, 0.2);
+}
+
+/* --- Message & Item List Styling --- */
+.message {
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 10px;
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.item-list {
+  margin-top: 20px;
+  list-style: none;
+  padding: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.item-list li {
+  background: #f9f9f9;
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-top: 10px;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
