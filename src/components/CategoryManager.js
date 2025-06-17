@@ -1,63 +1,80 @@
-// src/components/CategoryManager.js --- DYNAMIC VERSION ---
-
 import React, { useState, useEffect } from 'react';
 
 function CategoryManager() {
-  // State to hold the list of categories from the backend
   const [categories, setCategories] = useState([]);
-  // State for the new category name input field
   const [name, setName] = useState('');
-  // State to show a success or error message to the user
   const [message, setMessage] = useState('');
+  const [editId, setEditId] = useState(null);
+  const [editName, setEditName] = useState('');
 
-  // --- Function to fetch all categories from the backend ---
   const fetchCategories = async () => {
     try {
       const response = await fetch('/api/categories');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
       const data = await response.json();
       setCategories(data);
     } catch (error) {
-      console.error('Error fetching categories:', error);
       setMessage('Failed to load categories.');
     }
   };
 
-  // --- Use useEffect to run fetchCategories() when the component loads ---
   useEffect(() => {
     fetchCategories();
-  }, []); // The empty array means this runs only once on mount
+  }, []);
 
-  // --- Function to handle the form submission ---
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage(''); // Clear any previous messages
+    setMessage('');
 
     try {
-      // --- This is the POST request ---
       const response = await fetch('/api/categories', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ categoryName: name }), // Send the name in the request body
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryName: name }),
       });
 
-      if (!response.ok) {
-        // Handle cases where the backend returns an error (e.g., duplicate category)
-        const errorData = await response.text();
-        throw new Error(errorData || 'Failed to create category');
-      }
-
-      // If successful:
+      if (!response.ok) throw new Error(await response.text());
       setMessage(`Category "${name}" created successfully!`);
-      setName(''); // Clear the input field
-      fetchCategories(); // Re-fetch the list to show the new category instantly
-
+      setName('');
+      fetchCategories();
     } catch (error) {
-      console.error('Error creating category:', error);
+      setMessage(error.message);
+    }
+  };
+
+  const handleEdit = (category) => {
+    setEditId(category.categoryId);
+    setEditName(category.name);
+  };
+
+  const handleUpdate = async (id) => {
+    try {
+      const response = await fetch(`/api/categories/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryName: editName }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update category.');
+      setMessage(`Category updated successfully!`);
+      setEditId(null);
+      fetchCategories();
+    } catch (error) {
+      setMessage(error.message);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this category?')) return;
+
+    try {
+      const response = await fetch(`/api/categories/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete category.');
+      setMessage('Category deleted.');
+      fetchCategories();
+    } catch (error) {
       setMessage(error.message);
     }
   };
@@ -65,8 +82,6 @@ function CategoryManager() {
   return (
     <div className="manager-section">
       <h2>Manage Categories</h2>
-
-      {/* Form for adding a new category */}
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -78,15 +93,28 @@ function CategoryManager() {
         <button type="submit">Add Category</button>
       </form>
 
-      {/* Display success or error messages here */}
       {message && <p className="message">{message}</p>}
 
-      {/* List of existing categories */}
       <ul className="item-list">
-        {categories.map(category => (
+        {categories.map((category) => (
           <li key={category.categoryId}>
-            <span>{category.name} (ID: {category.categoryId})</span>
-            {/* We will add Edit/Delete buttons here later */}
+            {editId === category.categoryId ? (
+              <>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                />
+                <button onClick={() => handleUpdate(category.categoryId)}>Save</button>
+                <button onClick={() => setEditId(null)}>Cancel</button>
+              </>
+            ) : (
+              <>
+                <span>{category.categoryName} (ID: {category.categoryId})</span>
+                <button onClick={() => handleEdit(category)}>Edit</button>
+                <button onClick={() => handleDelete(category.categoryId)}>Delete</button>
+              </>
+            )}
           </li>
         ))}
       </ul>
