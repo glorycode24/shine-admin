@@ -1,34 +1,29 @@
 import axios from 'axios';
 
-// Create a new Axios instance with a custom configuration
 const api = axios.create({
-  // 1. Set the base URL for all requests
-  baseURL: 'http://localhost:8080', // Your backend server's address
+  baseURL: 'http://localhost:8080',
 });
 
-/*
-  2. The Magic of Interceptors (for when you add login)
-
-  Interceptors allow you to run code before a request is sent or after a response is received.
-  This is the perfect place to automatically add your JWT token to the headers.
-*/
+// This is the interceptor that attaches the token
 api.interceptors.request.use(
   (config) => {
-    // Get the token from wherever you store it (e.g., localStorage)
-    const token = localStorage.getItem('jwt_token'); 
+    // 👇 MAKE SURE THIS KEY IS CORRECT 👇
+    // This MUST exactly match the key you use in your AuthContext's login function.
+    const token = localStorage.getItem('admin_jwt_token'); 
     
-    // If the token exists, add it to the Authorization header
+    console.log("Interceptor: Found token?", token ? "Yes" : "No"); // For debugging
+
     if (token) {
+      // If the token is found, attach it to the Authorization header
       config.headers['Authorization'] = `Bearer ${token}`;
+      console.log("Interceptor: Attaching token to header:", config.headers['Authorization']); // For debugging
     }
     
-    return config; // Return the modified config
+    return config;
   },
   (error) => {
-    // Handle request errors
     return Promise.reject(error);
   }
 );
 
-// Export the configured instance to be used throughout your app
 export default api;
