@@ -9,7 +9,8 @@ function ProductManager() {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState('');
-
+  const [imageUrl, setImageUrl] = useState('');
+  const [imageFile, setImageFile] = useState(null);
   const [editId, setEditId] = useState(null);
 
   useEffect(() => {
@@ -43,12 +44,48 @@ function ProductManager() {
     setPrice('');
     setStockQuantity('');
     setCategoryId('');
+    setImageFile(null); 
     setEditId(null);
+    setImageUrl('');
   };
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
+    setMessage('Saving...');
+
+    // These are YOUR specific values from the screenshot
+    const yourCloudName = 'dzocrzhoh';
+    const yourUploadPreset = 'ShineProducts'; // The preset you just set to Unsigned
+
+    let finalImageUrl = imageUrl; 
+
+    if (imageFile) {
+        setMessage('Uploading image...');
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        formData.append('upload_preset', yourUploadPreset); // Use the variable here
+
+        try {
+            const cloudinaryResponse = await fetch(
+                `https://api.cloudinary.com/v1_1/${yourCloudName}/image/upload`, // Use the variable here
+                {
+                    method: 'POST',
+                    body: formData,
+                }
+            );
+            
+            if (!cloudinaryResponse.ok) {
+                throw new Error('Image upload failed. Check Cloudinary settings.');
+            }
+
+            const cloudinaryData = await cloudinaryResponse.json();
+            finalImageUrl = cloudinaryData.secure_url; 
+        } catch (error) {
+            setMessage(error.message);
+            console.error('Cloudinary upload error:', error);
+            return; 
+        }
+    }
 
     const productData = {
       productName,
@@ -56,6 +93,7 @@ function ProductManager() {
       price,
       stockQuantity,
       category: { categoryId },
+      imageUrl: finalImageUrl,
     };
 
     try {
@@ -82,6 +120,8 @@ function ProductManager() {
     setPrice(product.price);
     setStockQuantity(product.stockQuantity);
     setCategoryId(product.category.categoryId);
+    setImageUrl(product.imageUrl || '');
+    setImageFile(null);
   };
 
   const handleDelete = async (id) => {
@@ -141,6 +181,16 @@ function ProductManager() {
             </option>
           ))}
         </select>
+        {/* 👇 ADD THIS NEW INPUT FIELD 👇 */}
+{/* 👇 WITH THIS: 👇 */}
+<label htmlFor="image-upload">Product Image (Optional)</label>
+<input
+  id="image-upload"
+  type="file" 
+  accept="image/png, image/jpeg" // Only allow image files
+  onChange={e => setImageFile(e.target.files[0])} // Store the selected file in state
+/>
+
         <button type="submit">{editId ? 'Update Product' : 'Add Product'}</button>
         {editId && <button onClick={resetForm} type="button">Cancel</button>}
       </form>
