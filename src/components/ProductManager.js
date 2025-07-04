@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import loggingService from '../services/loggingService';
 
 function ProductManager() {
   const [productName, setProductName] = useState('');
@@ -105,7 +106,17 @@ function ProductManager() {
 
       if (!response.ok) throw new Error('Failed to save product.');
 
-      setMessage(editId ? 'Product updated successfully!' : 'Product created successfully!');
+      const result = await response.json();
+      
+      // Log the activity
+      if (editId) {
+        await loggingService.logProductUpdated(productName, editId);
+        setMessage('Product updated successfully!');
+      } else {
+        await loggingService.logProductCreated(productName, result.productId || 'Unknown');
+        setMessage('Product created successfully!');
+      }
+      
       resetForm();
       fetchProducts();
     } catch (error) {
@@ -126,9 +137,18 @@ function ProductManager() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
+    
+    // Get product name before deletion for logging
+    const productToDelete = products.find(p => p.productId === id);
+    const productName = productToDelete ? productToDelete.productName : 'Unknown';
+    
     try {
       const response = await fetch(`/api/products/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Failed to delete product.');
+      
+      // Log the deletion
+      await loggingService.logProductDeleted(productName, id);
+      
       setMessage('Product deleted.');
       fetchProducts();
     } catch (error) {

@@ -4,6 +4,7 @@ import { useAuth } from './context/AuthContext'; // Import useAuth
 import CategoryManager from './components/CategoryManager';
 import ProductManager from './components/ProductManager';
 import UserManager from './components/UserManager';
+import SessionLogs from './components/SessionLogs';
 import LoginPage from './pages/LoginPage'; // Import the new LoginPage
 
 // A component to protect our admin routes
@@ -62,6 +63,7 @@ function AdminDashboard() {
           <NavLink to="/products" className="nav-link">Manage Products</NavLink>
           <NavLink to="/categories" className="nav-link">Manage Categories</NavLink>
           <NavLink to="/users" className="nav-link">Manage Customers</NavLink>
+          <NavLink to="/logs" className="nav-link">Session Logs</NavLink>
         </nav>
       </header>
       <main className="container">
@@ -69,7 +71,8 @@ function AdminDashboard() {
           <Route path="/products" element={<ProductManager />} />
           <Route path="/categories" element={<CategoryManager />} />
           <Route path="/users" element={<UserManager />} />
-           <Route path="/" element={<Navigate replace to="/products" />} />
+          <Route path="/logs" element={<SessionLogs />} />
+          <Route path="/" element={<Navigate replace to="/products" />} />
         </Routes>
       </main>
     </>

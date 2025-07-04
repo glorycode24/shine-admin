@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api'; // Your central api service is crucial here
+import loggingService from '../services/loggingService';
 import './UserManager.css'; // Create a new CSS file for styles
 
 function UserManager() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const fetchUsers = async () => {
     try {
@@ -24,18 +27,32 @@ function UserManager() {
     fetchUsers();
   }, []);
 
-  const handleDelete = async (userId, userEmail) => {
-    if (!window.confirm(`Are you sure you want to delete user: ${userEmail}?`)) {
-      return;
-    }
+  const confirmDelete = (user) => {
+    setUserToDelete(user);
+    setShowModal(true);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!userToDelete) return;
     try {
-      await api.delete(`/api/admin/users/${userId}`);
+      await api.delete(`/api/admin/users/${userToDelete.userId}`);
+      
+      // Log the user deletion
+      await loggingService.logUserDeleted(userToDelete.email, userToDelete.userId);
+      
       setMessage('User deleted successfully.');
-      // Refresh the list automatically after a successful deletion
       fetchUsers();
     } catch (error) {
       setMessage('Failed to delete user.');
+    } finally {
+      setShowModal(false);
+      setUserToDelete(null);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setShowModal(false);
+    setUserToDelete(null);
   };
 
   if (loading) {
@@ -68,7 +85,8 @@ function UserManager() {
               <td>
                 <button 
                   className="delete-btn"
-                  onClick={() => handleDelete(user.userId, user.email)}
+                  onClick={() => confirmDelete(user)}
+                  title="Delete this user"
                 >
                   Delete
                 </button>
@@ -77,6 +95,18 @@ function UserManager() {
           ))}
         </tbody>
       </table>
+      {showModal && (
+        <div className="modal-backdrop">
+          <div className="modal">
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete user <b>{userToDelete?.email}</b>?</p>
+            <div className="modal-actions">
+              <button className="modal-btn confirm" onClick={handleDeleteConfirmed}>Yes, Delete</button>
+              <button className="modal-btn cancel" onClick={handleCancelDelete}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

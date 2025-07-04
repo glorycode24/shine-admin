@@ -6,7 +6,7 @@
   justify-content: center;
   align-items:center; /* Vertically center */
   min-height: 100vh; /* Make it take the full viewport height */
-  background-color: #f8f9fa; /* A light, clean background */
+  background-color: var(--bg-light-beige); /* Unified beige background */
   padding: 20px;
 }
 
@@ -15,10 +15,10 @@
   width: 100%;
   max-width: 420px; /* A good width for a login form */
   padding: 40px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid #dee2e6;
+  background-color: var(--bg-beige); /* Beige card */
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(139, 115, 85, 0.08); /* Subtle brown shadow */
+  border: 1.5px solid var(--border-beige);
 }
 
 /* The "Admin Panel Sign In" title */
@@ -26,7 +26,7 @@
   text-align: center;
   margin-bottom: 30px;
   font-size: 1.75rem;
-  color: #343a40;
+  color: var(--brand-brown);
 }
 
 /* Styles for each label-input group */
@@ -38,33 +38,34 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
-  color: #495057;
+  color: var(--brand-brown);
 }
 
 .form-group input {
   width: 100%;
   padding: 12px 15px;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
+  border: 1.5px solid var(--border-beige);
+  border-radius: 8px;
   font-size: 1rem;
+  background: var(--bg-light-beige);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 /* Add a nice focus effect to inputs */
 .form-group input:focus {
   outline: none;
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: var(--brand-brown);
+  box-shadow: 0 0 0 0.2rem rgba(139, 115, 85, 0.15);
 }
 
 /* The main action button */
 .auth-button {
   width: 100%;
   padding: 12px;
-  background-color: #343a40; /* A dark, professional color */
-  color: white;
+  background-color: var(--brand-brown); /* Brown button */
+  color: var(--text-light);
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
@@ -72,16 +73,16 @@
 }
 
 .auth-button:hover {
-  background-color: #23272b;
+  background-color: var(--brand-brown-dark);
 }
 
 /* Error message styling */
 .auth-error {
-  color: #dc3545; /* A standard red for errors */
+  color: #a94442; /* Muted brownish red for errors */
   text-align: center;
   margin-bottom: 15px;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
+  background-color: #f8e7e0; /* Light beige-pink for error bg */
+  border: 1.5px solid #e5b9b2;
   padding: 10px;
-  border-radius: 4px;
+  border-radius: 6px;
 }

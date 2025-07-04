@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import loggingService from '../services/loggingService';
 
 function CategoryManager() {
   const [categories, setCategories] = useState([]);
@@ -33,6 +34,12 @@ function CategoryManager() {
       });
 
       if (!response.ok) throw new Error(await response.text());
+      
+      const result = await response.json();
+      
+      // Log the category creation
+      await loggingService.logCategoryCreated(name, result.categoryId || 'Unknown');
+      
       setMessage(`Category "${name}" created successfully!`);
       setName('');
       fetchCategories();
@@ -55,6 +62,10 @@ function CategoryManager() {
       });
 
       if (!response.ok) throw new Error('Failed to update category.');
+      
+      // Log the category update
+      await loggingService.logCategoryUpdated(editName, id);
+      
       setMessage(`Category updated successfully!`);
       setEditId(null);
       fetchCategories();
@@ -66,12 +77,20 @@ function CategoryManager() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this category?')) return;
 
+    // Get category name before deletion for logging
+    const categoryToDelete = categories.find(c => c.categoryId === id);
+    const categoryName = categoryToDelete ? categoryToDelete.categoryName : 'Unknown';
+
     try {
       const response = await fetch(`/api/categories/${id}`, {
         method: 'DELETE',
       });
 
       if (!response.ok) throw new Error('Failed to delete category.');
+      
+      // Log the category deletion
+      await loggingService.logCategoryDeleted(categoryName, id);
+      
       setMessage('Category deleted.');
       fetchCategories();
     } catch (error) {
