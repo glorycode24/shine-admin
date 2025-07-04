@@ -21,6 +21,40 @@ body {
 
 /* --- Header --- */
 .app-header {
+  background-color: #ffffff;
+  padding: 0 20px; /* Remove top/bottom padding to let content define it */
+  border-bottom: 1px solid #dee2e6;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+}
+
+.header-user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logout-btn {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+  background-color: #5a6268;
+}
+
+.app-header {
   background-color: var(--bg-beige);
   color: var(--brand-brown);
   padding: 20px;
@@ -119,12 +153,71 @@ button:hover {
 }
 
 .item-list li {
-  background: #f9f9f9;
+  background: var(--bg-beige);
   padding: 15px;
-  border: 1px solid #eee;
-  border-radius: 8px;
+  border: 1.5px solid var(--border-beige);
+  border-radius: 10px;
   margin-top: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: var(--brand-brown);
+}
+
+/* --- React-Admin Form & Card Unification --- */
+.ra-input, .ra-field, .ra-form, .ra-create-view, .ra-edit-view, .ra-show-view, .ra-card, .ra-simple-form, .ra-list-view, .ra-list-page {
+  background: var(--bg-beige) !important;
+  color: var(--brand-brown) !important;
+  border-radius: 12px !important;
+  border: 1.5px solid var(--border-beige) !important;
+  box-shadow: 0 2px 8px rgba(139, 115, 85, 0.08) !important;
+}
+
+.ra-input input, .ra-input textarea, .ra-input select {
+  background: var(--bg-light-beige) !important;
+  border: 1.5px solid var(--border-beige) !important;
+  color: var(--brand-brown) !important;
+  border-radius: 8px !important;
+}
+
+.ra-input input:focus, .ra-input textarea:focus, .ra-input select:focus {
+  border-color: var(--brand-brown) !important;
+  box-shadow: 0 0 0 0.2rem rgba(139, 115, 85, 0.15) !important;
+}
+
+.ra-button, .ra-save-button, .ra-delete-button, .ra-edit-button, .ra-create-button {
+  background: var(--brand-brown) !important;
+  color: var(--text-light) !important;
+  border-radius: 8px !important;
+  border: none !important;
+  font-weight: 600 !important;
+  transition: background 0.2s;
+}
+
+.ra-button:hover, .ra-save-button:hover, .ra-delete-button:hover, .ra-edit-button:hover, .ra-create-button:hover {
+  background: var(--brand-brown-dark) !important;
+}
+
+/* ... your existing styles for .App, .app-header, .container ... */
+
+.admin-nav {
+  background-color: #333;
+  padding: 10px 0;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  transition: background-color 0.2s;
+}
+
+/* This style is AUTOMATICALLY applied by NavLink to the active link */
+.nav-link.active {
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
 }

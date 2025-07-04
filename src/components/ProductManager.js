@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import loggingService from '../services/loggingService';
 
 function ProductManager() {
   const [productName, setProductName] = useState('');
@@ -9,7 +10,8 @@ function ProductManager() {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [message, setMessage] = useState('');
-
+  const [imageUrl, setImageUrl] = useState('');
+  const [imageFile, setImageFile] = useState(null);
   const [editId, setEditId] = useState(null);
 
   useEffect(() => {
@@ -43,12 +45,48 @@ function ProductManager() {
     setPrice('');
     setStockQuantity('');
     setCategoryId('');
+    setImageFile(null); 
     setEditId(null);
+    setImageUrl('');
   };
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
+    setMessage('Saving...');
+
+    // These are YOUR specific values from the screenshot
+    const yourCloudName = 'dzocrzhoh';
+    const yourUploadPreset = 'ShineProducts'; // The preset you just set to Unsigned
+
+    let finalImageUrl = imageUrl; 
+
+    if (imageFile) {
+        setMessage('Uploading image...');
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        formData.append('upload_preset', yourUploadPreset); // Use the variable here
+
+        try {
+            const cloudinaryResponse = await fetch(
+                `https://api.cloudinary.com/v1_1/${yourCloudName}/image/upload`, // Use the variable here
+                {
+                    method: 'POST',
+                    body: formData,
+                }
+            );
+            
+            if (!cloudinaryResponse.ok) {
+                throw new Error('Image upload failed. Check Cloudinary settings.');
+            }
+
+            const cloudinaryData = await cloudinaryResponse.json();
+            finalImageUrl = cloudinaryData.secure_url; 
+        } catch (error) {
+            setMessage(error.message);
+            console.error('Cloudinary upload error:', error);
+            return; 
+        }
+    }
 
     const productData = {
       productName,
@@ -56,6 +94,7 @@ function ProductManager() {
       price,
       stockQuantity,
       category: { categoryId },
+      imageUrl: finalImageUrl,
     };
 
     try {
@@ -67,7 +106,17 @@ function ProductManager() {
 
       if (!response.ok) throw new Error('Failed to save product.');
 
-      setMessage(editId ? 'Product updated successfully!' : 'Product created successfully!');
+      const result = await response.json();
+      
+      // Log the activity
+      if (editId) {
+        await loggingService.logProductUpdated(productName, editId);
+        setMessage('Product updated successfully!');
+      } else {
+        await loggingService.logProductCreated(productName, result.productId || 'Unknown');
+        setMessage('Product created successfully!');
+      }
+      
       resetForm();
       fetchProducts();
     } catch (error) {
@@ -82,13 +131,24 @@ function ProductManager() {
     setPrice(product.price);
     setStockQuantity(product.stockQuantity);
     setCategoryId(product.category.categoryId);
+    setImageUrl(product.imageUrl || '');
+    setImageFile(null);
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
+    
+    // Get product name before deletion for logging
+    const productToDelete = products.find(p => p.productId === id);
+    const productName = productToDelete ? productToDelete.productName : 'Unknown';
+    
     try {
       const response = await fetch(`/api/products/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Failed to delete product.');
+      
+      // Log the deletion
+      await loggingService.logProductDeleted(productName, id);
+      
       setMessage('Product deleted.');
       fetchProducts();
     } catch (error) {
@@ -141,6 +201,16 @@ function ProductManager() {
             </option>
           ))}
         </select>
+        {/* 👇 ADD THIS NEW INPUT FIELD 👇 */}
+{/* 👇 WITH THIS: 👇 */}
+<label htmlFor="image-upload">Product Image (Optional)</label>
+<input
+  id="image-upload"
+  type="file" 
+  accept="image/png, image/jpeg" // Only allow image files
+  onChange={e => setImageFile(e.target.files[0])} // Store the selected file in state
+/>
+
         <button type="submit">{editId ? 'Update Product' : 'Add Product'}</button>
         {editId && <button onClick={resetForm} type="button">Cancel</button>}
       </form>
