@@ -72,7 +72,7 @@ function AdminDashboard() {
           <Route path="/categories" element={<CategoryManager />} />
           <Route path="/users" element={<UserManager />} />
           <Route path="/logs" element={<SessionLogs />} />
-          <Route path="/" element={<Navigate replace to="/products" />} />
+           <Route path="/" element={<Navigate replace to="/products" />} />
         </Routes>
       </main>
     </>
